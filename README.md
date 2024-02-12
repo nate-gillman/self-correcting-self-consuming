@@ -1,4 +1,4 @@
-# Self-Correcting Self-Consuming Loops for Generative Model Training
+## Self-Correcting Self-Consuming Loops for Generative Model Training
 
 
 [![arXiv](https://img.shields.io/badge/arXiv-<2209.14916>-<COLOR>.svg)](https://arxiv.org/abs/LINKHERE)
