@@ -7,11 +7,7 @@ The official PyTorch implementation of the paper [**"Self-Correcting Self-Consum
 
 Please visit our [**webpage**](https://nategillman.com/sc-sc.html) for more details.
 
-
-<video poster="" id="tree" autoplay controls muted loop height="100%">
-    <!-- Your video here -->
-    <source src="https://nategillman.com/scsc-static/videos/motion_null_cropped.mp4" type="video/mp4">
-</video>
+<video loop src="https://nategillman.com/scsc-static/videos/motion_null_cropped.mp4" title="movie.mp4"></video>">  video </video>
 
 **We're currently cleaning up the code, and we plan to release it very soon. If you have an urgent need for the code, please email the corresponding author. Thanks!!**
 
