@@ -16,7 +16,12 @@ Please visit our [**webpage**](https://nategillman.com/sc-sc.html) for more deta
 If you find this code useful in your research, please cite:
 
 ```
-@inproceedings{
-TODO
+@misc{gillman2024selfcorrecting,
+  title={Self-Correcting Self-Consuming Loops for Generative Model Training}, 
+  author={Nate Gillman and Michael Freeman and Daksh Aggarwal and Chia-Hong Hsu and Calvin Luo and Yonglong Tian and Chen Sun},
+  year={2024},
+  eprint={2402.07087},
+  archivePrefix={arXiv},
+  primaryClass={cs.LG}
 }
 ```
