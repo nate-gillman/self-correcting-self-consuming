@@ -406,13 +406,7 @@ python sample/checkpoint_visual_sampler.py exp_outputs/dataset_2794/visualizatio
 #### dataset size: $n = 64$
 
 ```bash
-# STEP 1: download pretrained weights, and randomly selected test split prompts
-python exp_scripts/download_weights.py
-
-# STEP 2: sample motions from checkpoints, then render motions.
-# command line arg #1: the path output from previous script
-# command line arg #2: quantity of samples to synthesize for each prompt
-python sample/checkpoint_visual_sampler.py exp_outputs/dataset_0064/visualization 1
+## in progress; we're uploading our weights soon
 ```
 
 </details>
