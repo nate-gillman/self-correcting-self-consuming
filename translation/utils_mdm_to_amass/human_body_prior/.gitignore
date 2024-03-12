@@ -1,0 +1,6 @@
+.idea/
+human_body_prior.egg-info/
+support_data/dowloads/*
+*.ipynb_checkpoints/
+*__pycache__/
+*.pyc

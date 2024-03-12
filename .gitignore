@@ -1,0 +1,237 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
+#   However, in case of collaboration, if having platform-specific dependencies or dependencies
+#   having no cross-platform support, pipenv may install dependencies that don't work, or not
+#   install all needed dependencies.
+#Pipfile.lock
+
+# PEP 582; used by e.g. github.com/David-OConnor/pyflow
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments / IDEs
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.vscode
+.idea
+*.swp
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# Memray
+*.bin
+memray_reports
+
+# Mac OS
+.DS_Store
+
+# Downloads
+amass_data
+mujoco
+assets/actionrecognition
+body_models
+dataset/HumanML3D
+dataset/KIT-ML
+dataset/Generated
+dataset/HumanAct12Poses
+dataset/uestc
+glove
+kit
+save
+t2m
+wandb
+UniversalHumanoidControl/data
+UniversalHumanoidControl/pretrained
+UniversalHumanoidControl/sample_data
+
+# Specific batch scripts
+scripts/PALM/legacy
+scripts/PALM/02_diffusion_train_steps_mdm/pretrained/humanml_trans_enc_512/*
+
+# Training Logs
+*.err
+*.out
+*.sbatch
+
+# For diffmimic
+logs
+diffmimic/outputs
+diffmimic/.vscode
+
+# translation
+model.npz
+translation/utils_smpl
+.tmp/*
+results/motion_im/uhc_explicit/results/5000_amass_copycat_take5_test_small.pkl_coverage_full.pkl
+results/motion_im/uhc_explicit/log/log.txt
+
+# Synthetic dataset generation, for POC
+dataset/Samples_POC
+.tmp_generate/hml_motion.npy
+scripts/PALM/01_humanml_subset_mdm/save-exp-*
+dataset/Samples_POC_large_scale
+scripts/PALM/03_humanml_large_POC/save-exp*
+dataset/Samples_POC_varying_lengths
+dataset/Samples_POC_varying_lengths_v2
+dataset/Samples_POC_varying_lengths-mini
+
+
+
+scripts/PALM/04_POC_nearest_neighbor/save-exp*
+
+scripts/PALM/04_POC_nearest_neighbor/motion_visuals
+dataset/Samples_POC_varying_lengths_v2
+
+
+scripts/PALM/05_self_consuming_loop/save-exp*
+
+scripts/PALM/05_self_consuming_loop/v2
+scripts/PALM/05_self_consuming_loop/v3
+results/motion_im/uhc_implicit/log/log.txt
+results/motion_im/uhc_implicit_shape/log/log.txt
+
+scripts/PALM/06_self_consuming_loop_v3/save-exp*
+scripts/PALM/06_self_consuming_loop_v3/hacky/model/generation_1/synthetic_motions
+scripts/PALM/06_self_consuming_loop_v3/hacky/model/args.json
+
+scripts/PALM/06_self_consuming_loop_v3/hacky/model/generation_1/
+scripts/PALM/06_self_consuming_loop_v3/hacky/model/generation_0/args.json
+
+
+dataset/HumanML3D_subset
+dataset/HumanML3D_subset_*
+scripts/PALM/07_sc_loop_subset/F_Subjects_1_90/
+scripts/PALM/07_sc_loop_subset/save-exp-*
+scripts/PALM/07_sc_loop_subset/old
+scripts/PALM/07_sc_loop_subset/save-train-*
+scripts/PALM/07_sc_loop_subset/save-baseline-*
+scripts/PALM/08_iterative_finetuning/save-*
+scripts/PALM/09_iterative_finetuning/save-*
+
+
+# for visualization
+visualize/to_visualize
+visualize/to_visualize_v2
+visualize/to_visualize_v2.zip
+visualize/to_visualize_v2_old.zip
+scripts/PALM/10_few_shot_iterative_finetuning/save-*
+scripts/PALM/10_few_shot_iterative_finetuning/old
+
+
+exp_outputs
+dataset/F_Subjects_1_90
+
+test_videos
