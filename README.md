@@ -406,7 +406,7 @@ python sample/checkpoint_visual_sampler.py exp_outputs/dataset_2794/visualizatio
 #### dataset size: $n = 64$
 
 ```bash
-## in progress; we're uploading our weights soon
+## in progress; we're uploading our weights soon!
 ```
 
 </details>
