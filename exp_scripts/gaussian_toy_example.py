@@ -177,6 +177,103 @@ class WhiteningSelfCorrection(GaussianSelfConsumingLoop):
         return replacement_data
 
 
+class RejectionSamplingCorrection(GaussianSelfConsumingLoop):
+    """
+    The task here is to start with a Gaussian, and over time, via self-augmentation
+    with self-correction move towards the actual distribution.
+
+    The self-correction operation here is based on rejection sampling, according to projection_strength,
+    as follows: given a set of n examples to which we want to apply self_correction, the correction of this 
+    set is a sample of size n drawn using rejection sampling from the pdf that is the weighted average 
+    of the empirical pdf of the set and the target distribution, where the weight corresponds to the projection strength 
+    """
+
+    def __init__(
+            self,
+            n_samples_gt=1000,
+            accumulate_synth_examples=False,
+            projection_strength=1.0,
+            initial_cov=np.eye(2),
+            initial_mean=np.zeros(2),
+            target_cov=np.eye(2),
+            target_mean=np.zeros(2)
+    ):
+        super().__init__(n_samples_gt)
+        self.initial_cov = initial_cov
+        self.initial_mean = initial_mean
+        self.target_cov = target_cov
+        self.target_mean = target_mean
+        self.projection_strength = projection_strength
+
+        self.accumulate_synth_examples = accumulate_synth_examples
+
+        if self.accumulate_synth_examples:
+            self.accumulated_synth_examples = {}  # initialize empty dict
+
+    def self_correction(self, data, **kwargs):
+
+        replacement_data = self.rejection_sampling(data)
+
+        if self.accumulate_synth_examples:
+
+            # we accumulate augmentation examples between generations to simulate fine-tuning
+            self.accumulated_synth_examples[kwargs["step"]] = replacement_data
+
+            accumulated_synth_examples = np.zeros((0, 2))
+            num_generations = len(self.accumulated_synth_examples)
+
+            for i in range(num_generations):
+                ith_synth_examples = self.accumulated_synth_examples[i]
+                num_include = int(((i + 1) / num_generations) * data.shape[0])
+                ith_synth_examples = ith_synth_examples[:num_include]
+
+                accumulated_synth_examples = np.concatenate((accumulated_synth_examples, ith_synth_examples))
+
+            replacement_data = accumulated_synth_examples
+
+        return replacement_data
+
+
+    def rejection_sampling(self, data):
+
+        # Use a Gaussian with higher variance for the proposal distribution since it eventually dominates the target distribution
+        proposal_cov = 2*self.target_cov
+        proposal_mean = self.target_mean
+
+        num_bins = 10
+        empirical_pdf, xedges, yedges = np.histogram2d(data[:, 0], data[:, 1], bins=num_bins, density=True)
+        n_samples = data.shape[0]
+
+        xdelta = xedges[1] - xedges[0]
+        ydelta = yedges[1] - yedges[0]
+
+        # Compute a bound M on the ratio (pdf of distribution we want to sample from/ pdf of proposal distribution)
+        # Since Gaussians are peaked at the mean, the max ratio occurs at the mean [0, 0]
+        M = scipy.stats.multivariate_normal.pdf([0,0], self.target_mean, self.target_cov)
+        M = M/scipy.stats.multivariate_normal.pdf([0,0], proposal_mean, proposal_cov)
+
+        count = 0
+        synth_data = np.zeros((n_samples, 2))
+        while count < n_samples:
+            candidate = self.rng.multivariate_normal(proposal_mean, proposal_cov)
+            u = self.rng.uniform()
+            # find correct x and y index for generated candidate value
+            i_x = int((candidate[0] - xedges[0])/ xdelta) 
+            i_y = int((candidate[1] - yedges[0])/ ydelta)
+
+            emp = 0.0
+            # if indices are not out of bounds assign empirical pdf value else 0
+            if not(i_x >= num_bins or i_y >= num_bins or i_x < 0 or i_y < 0):
+                emp = empirical_pdf[i_x][i_y] 
+
+            pdf_eval = (1-self.projection_strength) * emp + self.projection_strength * scipy.stats.multivariate_normal.pdf(candidate, self.target_mean, self.target_cov)
+            if pdf_eval/(M*scipy.stats.multivariate_normal.pdf(candidate, proposal_mean, proposal_cov)) > u:
+                synth_data[count] = candidate
+                count += 1
+
+        return synth_data
+
+
 def get_w2(lst_with_tuples):
     lst = [elt[0] for elt in lst_with_tuples]
 
@@ -265,7 +362,7 @@ def run_exps() -> None:
     w2s = {}
     for projection_strength in gamma_values:
         t_value = projection_strength / (1 + projection_strength)
-
+        '''
         denoising_v1_loop = WhiteningSelfCorrection(
             n_samples_gt=n_samples_gt,
             accumulate_synth_examples=accumulate_synth_examples,
@@ -280,11 +377,27 @@ def run_exps() -> None:
             n_steps=n_steps,
             synth_aug_percent=synth_aug_percent
         )
+        '''
+
+        denoising_v2_loop = RejectionSamplingCorrection(
+            n_samples_gt=n_samples_gt,
+            accumulate_synth_examples=accumulate_synth_examples,
+            projection_strength=t_value,
+            initial_cov=initial_cov,
+            initial_mean=initial_mean,
+            target_cov=target_cov,
+            target_mean=target_mean
+        )
+
+        w2_values = denoising_v2_loop.run_self_correction_augmentation_loop(
+            n_steps=n_steps,
+            synth_aug_percent=synth_aug_percent
+        )
 
         w2s[projection_strength] = w2_values
 
     # given the w2s, produce a graph and save to disk at this location
-    build_graph(w2s, "exp_outputs/gaussian_toy_example.png")
+    build_graph(w2s, "exp_outputs/gaussian_toy_example_v2.png")
 
 
 if __name__ == "__main__":
