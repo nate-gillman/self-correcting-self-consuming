@@ -177,15 +177,17 @@ class WhiteningSelfCorrection(GaussianSelfConsumingLoop):
         return replacement_data
 
 
-class RejectionSamplingCorrection(GaussianSelfConsumingLoop):
+class PointwiseCorrection(GaussianSelfConsumingLoop):
     """
     The task here is to start with a Gaussian, and over time, via self-augmentation
     with self-correction move towards the actual distribution.
 
     The self-correction operation here is based on rejection sampling, according to projection_strength,
-    as follows: given a set of n examples to which we want to apply self_correction, the correction of this 
-    set is a sample of size n drawn using rejection sampling from the pdf that is the weighted average 
-    of the empirical pdf of the set and the target distribution, where the weight corresponds to the projection strength 
+    as follows: given a set of n examples to which we want to apply self_correction, we draw a sample of size n 
+    using rejection sampling from the pdf that is the weighted average of the empirical pdf of the set and the target distribution,
+    where the weight corresponds to the projection strength.
+    The pointwise correction on the original data is then the bijection from the data to the sampled data that satisfies
+    optimal transport.
     """
 
     def __init__(
@@ -212,7 +214,8 @@ class RejectionSamplingCorrection(GaussianSelfConsumingLoop):
 
     def self_correction(self, data, **kwargs):
 
-        replacement_data = self.rejection_sampling(data)
+        empirical_pdf, xedges, yedges = np.histogram2d(data[:, 0], data[:, 1], bins=10, density=True)
+        replacement_data = self.rejection_sampling(empirical_pdf, xedges, yedges, data.shape[0])
 
         if self.accumulate_synth_examples:
 
@@ -234,22 +237,19 @@ class RejectionSamplingCorrection(GaussianSelfConsumingLoop):
         return replacement_data
 
 
-    def rejection_sampling(self, data):
+    def rejection_sampling(self, empirical_pdf, xedges, yedges, n_samples):
 
-        # Use a Gaussian with higher variance for the proposal distribution since it eventually dominates the target distribution
-        proposal_cov = 2*self.target_cov
+        # Use ideal Gaussian for the proposal distribution since it eventually dominates the distribution we want to sample from
+        proposal_cov = self.target_cov
         proposal_mean = self.target_mean
-
-        num_bins = 10
-        empirical_pdf, xedges, yedges = np.histogram2d(data[:, 0], data[:, 1], bins=num_bins, density=True)
-        n_samples = data.shape[0]
 
         xdelta = xedges[1] - xedges[0]
         ydelta = yedges[1] - yedges[0]
+        num_bins = empirical_pdf.shape[0]
 
-        # Compute a bound M on the ratio (pdf of distribution we want to sample from/ pdf of proposal distribution)
-        # Since Gaussians are peaked at the mean, the max ratio occurs at the mean [0, 0]
-        M = scipy.stats.multivariate_normal.pdf([0,0], self.target_mean, self.target_cov)
+        # Compute a bound M on the ratio (pdf of distribution we want to sample from / pdf of proposal distribution)
+        M = np.max(empirical_pdf)
+        M = (1-self.projection_strength) * M + self.projection_strength * scipy.stats.multivariate_normal.pdf([0,0], self.target_mean, self.target_cov)
         M = M/scipy.stats.multivariate_normal.pdf([0,0], proposal_mean, proposal_cov)
 
         count = 0
@@ -257,7 +257,7 @@ class RejectionSamplingCorrection(GaussianSelfConsumingLoop):
         while count < n_samples:
             candidate = self.rng.multivariate_normal(proposal_mean, proposal_cov)
             u = self.rng.uniform()
-            # find correct x and y index for generated candidate value
+            # find x and y index for generated candidate value
             i_x = int((candidate[0] - xedges[0])/ xdelta) 
             i_y = int((candidate[1] - yedges[0])/ ydelta)
 
@@ -267,6 +267,7 @@ class RejectionSamplingCorrection(GaussianSelfConsumingLoop):
                 emp = empirical_pdf[i_x][i_y] 
 
             pdf_eval = (1-self.projection_strength) * emp + self.projection_strength * scipy.stats.multivariate_normal.pdf(candidate, self.target_mean, self.target_cov)
+            
             if pdf_eval/(M*scipy.stats.multivariate_normal.pdf(candidate, proposal_mean, proposal_cov)) > u:
                 synth_data[count] = candidate
                 count += 1
@@ -356,6 +357,7 @@ def run_exps() -> None:
     #   0.0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 1.0, 2.0, 3.0, 4.0, 5.0, 10.0
     # ]
 
+    #gamma_values = [0.1, 5]
     n_samples_gt = 50
     synth_aug_percent = 0.5
 
@@ -379,7 +381,7 @@ def run_exps() -> None:
         )
         '''
 
-        denoising_v2_loop = RejectionSamplingCorrection(
+        denoising_v2_loop = PointwiseCorrection(
             n_samples_gt=n_samples_gt,
             accumulate_synth_examples=accumulate_synth_examples,
             projection_strength=t_value,
