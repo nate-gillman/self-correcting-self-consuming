@@ -105,19 +105,17 @@ class GaussianSelfConsumingLoop(ABC):
 
         return np.sqrt(mean_component + var_component), mean_component, var_component
 
-
-class WhiteningSelfCorrection(GaussianSelfConsumingLoop):
+class PointwiseCorrection(GaussianSelfConsumingLoop):
     """
     The task here is to start with a Gaussian, and over time, via self-augmentation
     with self-correction move towards the actual distribution.
 
-    The self-correction operation here is a denoising transform, according to projection_strength,
-    as follows: given a set of n examples to which we want to apply self_correction, we
-    generate a random set of n examples from the ground truth reference distribution; then
-    we find an assignment of the original n examples to the self-correction n examples
-    in a way such that the average (i.e. total) distance is minimized; THEN the whitening
-    is just transferring the synthesized examples to the gt examples, according to projection
-    strength
+    The self-correction operation here is based on rejection sampling, according to projection_strength,
+    as follows: given a set of n examples to which we want to apply self_correction, we draw a sample of size n 
+    using rejection sampling from the pdf that is the weighted average of the empirical pdf of the set and the target distribution,
+    where the weight corresponds to the projection strength.
+    The pointwise correction on the original data is then the bijection from the data to the sampled data that satisfies
+    optimal transport.
     """
 
     def __init__(
@@ -144,18 +142,13 @@ class WhiteningSelfCorrection(GaussianSelfConsumingLoop):
 
     def self_correction(self, data, **kwargs):
 
-        # sample data from target distribution
-        data_from_gt_dist = self.rng.multivariate_normal(self.target_mean, self.target_cov, data.shape[0])
+        empirical_pdf, xedges, yedges = np.histogram2d(data[:, 0], data[:, 1], bins=10, density=True)
 
-        # smartly assign each point which we want to correct to a point from the good samples
-        dist_matrix = cdist(data, data_from_gt_dist)
-        assignment = linear_sum_assignment(dist_matrix)
-        data_from_gt_dist = data_from_gt_dist[assignment[1]]
-
-        # self correction here means moving points in the direction of the target distribution
-        replacement_data = (
-                self.projection_strength * data_from_gt_dist + (1 - self.projection_strength) * data
-        )
+        # if n = data.shape[0], then this function call samples n data points from the averaged PDF 
+        #     (target_pdf + gamma*empirical_pdf(data))/(1+gamma),
+        # and names the data points replacement_data. this effectively maps each point in data to a 
+        # point in replacement_data in a way that minimizes the total distance traveled.
+        replacement_data = self.rejection_sampling(empirical_pdf, xedges, yedges, data.shape[0])
 
         if self.accumulate_synth_examples:
 
@@ -177,9 +170,49 @@ class WhiteningSelfCorrection(GaussianSelfConsumingLoop):
         return replacement_data
 
 
+    def rejection_sampling(self, empirical_pdf, xedges, yedges, n_samples):
+        """
+        Implements the rejection sampling algorithm spelled out in https://en.wikipedia.org/wiki/Rejection_sampling#Algorithm
+        """
+
+        # Use ideal Gaussian for the proposal distribution since it eventually dominates the distribution we want to sample from
+        proposal_cov = self.target_cov
+        proposal_mean = self.target_mean
+
+        xdelta = xedges[1] - xedges[0]
+        ydelta = yedges[1] - yedges[0]
+        num_bins = empirical_pdf.shape[0]
+
+        # Compute a bound M on the ratio (pdf of distribution we want to sample from / pdf of proposal distribution)
+        max_of_pdf_we_want_to_sample_from = (1-self.projection_strength) * np.max(empirical_pdf) + self.projection_strength * scipy.stats.multivariate_normal.pdf([0,0], self.target_mean, self.target_cov)
+        max_of_pdf_of_proposal_distribution = scipy.stats.multivariate_normal.pdf([0,0], proposal_mean, proposal_cov)
+        M = max_of_pdf_we_want_to_sample_from / max_of_pdf_of_proposal_distribution
+
+        count = 0
+        synth_data = np.zeros((n_samples, 2))
+        while count < n_samples:
+            candidate = self.rng.multivariate_normal(proposal_mean, proposal_cov)
+            u = self.rng.uniform()
+            # find x and y index for generated candidate value
+            i_x = int((candidate[0] - xedges[0])/ xdelta) 
+            i_y = int((candidate[1] - yedges[0])/ ydelta)
+
+            emp = 0.0
+            # if indices are not out of bounds assign empirical pdf value else 0
+            if not(i_x >= num_bins or i_y >= num_bins or i_x < 0 or i_y < 0):
+                emp = empirical_pdf[i_x][i_y] 
+
+            pdf_eval = (1-self.projection_strength) * emp + self.projection_strength * scipy.stats.multivariate_normal.pdf(candidate, self.target_mean, self.target_cov)
+            
+            if pdf_eval/(M*scipy.stats.multivariate_normal.pdf(candidate, proposal_mean, proposal_cov)) > u:
+                synth_data[count] = candidate
+                count += 1
+
+        return synth_data
+
+
 def get_w2(lst_with_tuples):
     lst = [elt[0] for elt in lst_with_tuples]
-
     return lst
 
 
@@ -266,7 +299,7 @@ def run_exps() -> None:
     for projection_strength in gamma_values:
         t_value = projection_strength / (1 + projection_strength)
 
-        denoising_v1_loop = WhiteningSelfCorrection(
+        scsc_loop = PointwiseCorrection(
             n_samples_gt=n_samples_gt,
             accumulate_synth_examples=accumulate_synth_examples,
             projection_strength=t_value,
@@ -276,7 +309,7 @@ def run_exps() -> None:
             target_mean=target_mean
         )
 
-        w2_values = denoising_v1_loop.run_self_correction_augmentation_loop(
+        w2_values = scsc_loop.run_self_correction_augmentation_loop(
             n_steps=n_steps,
             synth_aug_percent=synth_aug_percent
         )
