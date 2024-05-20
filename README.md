@@ -225,8 +225,9 @@ mkdir -p exp_outputs/mnist
 python exp_scripts/mnist/fid_lenet.py
 ```
 
-This first one trains the baseline.
-You need to let this one finish generation 0; then you can run the rest of them.
+This first training script trains the baseline, which is generations 0 through 50.
+The last checkpoint from Generation 0 will  be used to seed all of the self-consuming experiments.
+Don't start the other runs until this run finishes.
 
 ```bash
 NUM_EPOCH=20
@@ -241,7 +242,9 @@ python exp_scripts/mnist/self_consuming_ddpm_mini.py \
     --resume_starting_at_generation 0
 ```
 
-**PICK UP HERE!!**
+This script trains the self-consuming loop.
+To recreate the results from the paper, you should run this script four times, for each `SYNTH_AUG_PERCENT` in `{0.2, 0.5, 1.0, 1.5}`.
+These can all be run in parallel.
 
 ```bash
 NUM_EPOCH=20
@@ -256,6 +259,10 @@ python exp_scripts/mnist/self_consuming_ddpm_mini.py \
     --resume_starting_at_generation 0
 ```
 
+And this script trains the self-consuming loop with self-correction.
+Again, to recreate the results from the paper, you should run this script four times, for each `SYNTH_AUG_PERCENT` in `{0.2, 0.5, 1.0, 1.5}`.
+These can also all be run in parallel.
+
 ```bash
 NUM_EPOCH=20
 SYNTH_AUG_PERCENT=0.1
@@ -269,6 +276,9 @@ python exp_scripts/mnist/self_consuming_ddpm_mini.py \
     --lr_divisor 20 \
     --resume_starting_at_generation 0
 ```
+
+At any point during training, you can check on progress by running the below script.
+It will generate graphs and write them to `exp_outputs/mnist/graphs`.
 
 ```bash
 python exp_scripts/mnist/generate_graphs.py ./exp_outputs/mnist
