@@ -26,7 +26,7 @@ Note that their code depends on other libraries, including CLIP, SMPL, SMPL-X, P
 
 ### Step 1: build conda env
 
-Run the script: `./setup.sh` from the root of the repository.
+Run the script: `./setup.sh`.
 
 This will create a conda virtual environment and perform a basic test (`test_environment.py`) to see if all succeeds. 
 
@@ -199,6 +199,81 @@ bash download_data.sh
 ```bash
 python exp_scripts/gaussian_toy_example.py
 ```
+
+</details>
+
+<details>
+  <summary><b> Running the self-consuming loop experiments: MNIST toy example </b></summary>
+
+<br>
+
+Create a separate conda env for these experiments:
+
+```bash
+conda create -n mnist_toy python=3.11
+conda activate mnist_toy
+
+conda install pytorch==2.2.0 torchvision==0.17.0 torchaudio==2.2.0 pytorch-cuda=12.1 -c pytorch -c nvidia
+conda install tqdm matplotlib -y
+conda install scikit-learn -y
+```
+
+Train an image classifer for MNIST digits; the learned embeddings will be used to compute the FID scores later.
+
+```bash
+mkdir -p exp_outputs/mnist
+python exp_scripts/mnist/fid_lenet.py
+```
+
+This first one trains the baseline.
+You need to let this one finish generation 0; then you can run the rest of them.
+
+```bash
+NUM_EPOCH=20
+
+python exp_scripts/mnist/self_consuming_ddpm_mini.py \
+    --n_epoch_for_training_from_scratch ${NUM_EPOCH} \
+    --train_type baseline \
+    --synth_aug_percent 0.0 \
+    --fraction_of_train_set_to_train_on 0.2 \
+    --save_dir_parent ./exp_outputs/mnist/ \
+    --lr_divisor 20 \
+    --resume_starting_at_generation 0
+```
+
+**PICK UP HERE!!**
+
+```bash
+NUM_EPOCH=20
+SYNTH_AUG_PERCENT=0.1
+python exp_scripts/mnist/self_consuming_ddpm_mini.py \
+    --n_epoch_for_training_from_scratch ${NUM_EPOCH} \
+    --train_type iterative_finetuning \
+    --synth_aug_percent ${SYNTH_AUG_PERCENT} \
+    --fraction_of_train_set_to_train_on 0.2 \
+    --save_dir_parent ./exp_outputs/mnist/ \
+    --lr_divisor 20 \
+    --resume_starting_at_generation 0
+```
+
+```bash
+NUM_EPOCH=20
+SYNTH_AUG_PERCENT=0.1
+python exp_scripts/mnist/self_consuming_ddpm_mini.py \
+    --n_epoch_for_training_from_scratch ${NUM_EPOCH} \
+    --train_type iterative_finetuning_with_correction \
+    --synth_aug_percent ${SYNTH_AUG_PERCENT} \
+    --fraction_of_train_set_to_train_on 0.2 \
+    --n_clusters_per_digit 16 \
+    --save_dir_parent ./exp_outputs/mnist/ \
+    --lr_divisor 20 \
+    --resume_starting_at_generation 0
+```
+
+```bash
+python exp_scripts/mnist/generate_graphs.py ./exp_outputs/mnist
+```
+
 
 </details>
 
@@ -420,6 +495,7 @@ We thank the authors of the works we build upon:
 - [VPoser aka Human Body Prior](https://github.com/nghorbani/human_body_prior)
 - [Body Visualizer](https://github.com/nghorbani/body_visualizer)
 - [HumanML3D](https://github.com/EricGuo5513/HumanML3D)
+- [Conditional_Diffusion_MNIST](https://github.com/TeaPearce/Conditional_Diffusion_MNIST)
 
 Our visualizations are inspired by
 - [PhysDiff: Physics-Guided Human Motion Diffusion Model](https://nvlabs.github.io/PhysDiff/)
