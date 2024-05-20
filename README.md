@@ -248,7 +248,7 @@ These can all be run in parallel.
 
 ```bash
 NUM_EPOCH=20
-SYNTH_AUG_PERCENT=0.1
+SYNTH_AUG_PERCENT=0.2
 python exp_scripts/mnist/self_consuming_ddpm_mini.py \
     --n_epoch_for_training_from_scratch ${NUM_EPOCH} \
     --train_type iterative_finetuning \
@@ -265,7 +265,7 @@ These can also all be run in parallel.
 
 ```bash
 NUM_EPOCH=20
-SYNTH_AUG_PERCENT=0.1
+SYNTH_AUG_PERCENT=0.2
 python exp_scripts/mnist/self_consuming_ddpm_mini.py \
     --n_epoch_for_training_from_scratch ${NUM_EPOCH} \
     --train_type iterative_finetuning_with_correction \
