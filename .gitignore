@@ -233,5 +233,6 @@ scripts/PALM/10_few_shot_iterative_finetuning/old
 
 exp_outputs
 dataset/F_Subjects_1_90
+dataset/MNIST
 
 test_videos
