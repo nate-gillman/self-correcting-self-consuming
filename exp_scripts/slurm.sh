@@ -7,7 +7,7 @@
 #SBATCH --constraint=a6000|geforce3090
 #SBATCH --exclude=gpu2108,gpu2114,gpu2115,gpu2116
 #SBATCH -N 1 # gives one node, makes sure cpu cores are on same node
-#SBATCH -c 4 # requests four CPU cores
+#SBATCH -c 1 # requests four CPU cores
 #SBATCH --mem=63G
 #SBATCH -t 96:00:00
 #SBATCH -e exp_outputs/slurm_logs/%j.err
@@ -30,8 +30,7 @@ source /gpfs/runtime/opt/anaconda/2020.02/etc/profile.d/conda.sh
 conda activate /gpfs/home/ngillman/.conda/envs/scsc
 
 # Move to correct working directory
-HOME_DIR=/oscar/data/superlab/users/nates_stuff/self-correcting-self-consuming-cleanup
+HOME_DIR=/oscar/data/superlab/users/nates_stuff/self-correcting-self-consuming
 cd ${HOME_DIR}
 
 # put the script execution statement here
-rsync -av --exclude='.git' /oscar/data/superlab/users/nates_stuff/self-correcting-self-consuming-cleanup/ /oscar/data/superlab/users/nates_stuff/self-correcting-self-consuming/
