@@ -4,7 +4,7 @@
 
 [![arXiv](https://img.shields.io/badge/arXiv-2402.07087-<COLOR>.svg)](https://arxiv.org/abs/2402.07087)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Venue:ICML 2024](https://img.shields.io/badge/Venue-ICML%202023-007CFF)](https://icml.cc/)
+[![Venue:ICML 2024](https://img.shields.io/badge/Venue-ICML%202024-007CFF)](https://icml.cc/)
 
 </div>
 
