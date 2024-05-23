@@ -1,6 +1,6 @@
 <div align="center">
 
-## Self-Correcting Self-Consuming Loops for Generative Model Training
+# Self-Correcting Self-Consuming Loops for Generative Model Training
 
 [![arXiv](https://img.shields.io/badge/arXiv-2402.07087-<COLOR>.svg)](https://arxiv.org/abs/2402.07087)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
