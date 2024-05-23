@@ -1,10 +1,12 @@
-## Self-Correcting Self-Consuming Loops for Generative Model Training
+<div align="center">
 
+## Self-Correcting Self-Consuming Loops for Generative Model Training
 
 [![arXiv](https://img.shields.io/badge/arXiv-2402.07087-<COLOR>.svg)](https://arxiv.org/abs/2402.07087)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Venue:ICML 2024](https://img.shields.io/badge/Venue-ICML%202023-007CFF)](https://icml.cc/)
 
+</div>
 
 The official PyTorch implementation of the paper [**"Self-Correcting Self-Consuming Loops for Generative Model Training"**](https://arxiv.org/abs/2402.07087), which has been accepted at [**ICML 2024**](https://icml.cc/Conferences/2024).
 Please visit our [**webpage**](https://nategillman.com/sc-sc.html) for more details.
