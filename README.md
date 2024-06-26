@@ -30,7 +30,12 @@ Note that their code depends on other libraries, including CLIP, SMPL, SMPL-X, P
 
 ### Step 1: build conda env
 
-Run the script: `./setup.sh`.
+Run the script: 
+
+```bash
+cd utils/setup
+./setup.sh
+```
 
 This will create a conda virtual environment and perform a basic test (`test_environment.py`) to see if all succeeds. 
 
