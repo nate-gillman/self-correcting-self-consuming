@@ -493,19 +493,6 @@ python sample/checkpoint_visual_sampler.py exp_outputs/dataset_2794/visualizatio
 </details>
 
 
-<details>
-  <summary><b>Synthesizing and rendering human motions using our pretrained weights</b></summary>
-  
-
-#### dataset size: $n = 64$
-
-```bash
-## in progress; we're uploading our weights soon!
-```
-
-</details>
-
-
 ## Acknowledgments
 
 We thank the authors of the works we build upon:
