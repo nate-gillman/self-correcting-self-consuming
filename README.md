@@ -199,7 +199,7 @@ bash download_data.sh
 
 </details>
 
-Running the self-consuming loop experiments
+## Running the self-consuming loop experiments
 
 <details>
   <summary><b> Toy example #1: Gaussian </b></summary>
