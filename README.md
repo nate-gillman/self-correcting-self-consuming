@@ -199,9 +199,10 @@ bash download_data.sh
 
 </details>
 
+### Running the self-consuming loop experiments
 
 <details>
-  <summary><b> Running the self-consuming loop experiments: Gaussian toy example </b></summary>
+  <summary><b> Toy example #1: Gaussian </b></summary>
 
 <br>
 
@@ -212,7 +213,7 @@ python exp_scripts/gaussian_toy_example.py
 </details>
 
 <details>
-  <summary><b> Running the self-consuming loop experiments: MNIST toy example </b></summary>
+  <summary><b> Toy example #2: MNIST </b></summary>
 
 <br>
 
@@ -298,7 +299,7 @@ python exp_scripts/mnist/generate_graphs.py ./exp_outputs/mnist
 
 
 <details>
-  <summary><b> Running the self-consuming loop experiments: human motion generation</b></summary>
+  <summary><b> Human motion generation </b></summary>
 
 <br>
 
@@ -489,6 +490,14 @@ python sample/checkpoint_visual_sampler.py exp_outputs/dataset_2794/visualizatio
 
 </details>
 
+
+After a training run of iterative fine-tuning with correction finishes, you have the option of visualizing synthetic motions for a given generation before and after the UHC self-correction.
+To do this, you can run the following script.
+The command line argument should point do a folder which contains the `synthetic_motions` subdirectory.
+
+```bash
+python sample/visualize_motion_sequences.py exp_outputs/dataset_0064_seed_47/synthetic_percent_100_iterative_finetuning_with_correction/generation_50
+```
 
 </details>
 
