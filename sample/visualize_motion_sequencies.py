@@ -491,7 +491,7 @@ if __name__ == "__main__":
     max_frames = 196
     motion_framerate = 20.0
     sampler_batch_size = 64
-    # samples_per_prompt = int(sys.argv[2])
+    samples_per_prompt = int(sys.argv[2])
 
     # --- CREATE PROMPTS FOR SAMPLING ---
     # get prompt information from text files
