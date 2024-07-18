@@ -521,12 +521,13 @@ Our visualizations are inspired by
 If you find this code useful in your research, please cite:
 
 ```
-@misc{gillman2024selfcorrecting,
-  title={Self-Correcting Self-Consuming Loops for Generative Model Training}, 
-  author={Nate Gillman and Michael Freeman and Daksh Aggarwal and Chia-Hong Hsu and Calvin Luo and Yonglong Tian and Chen Sun},
+@InProceedings{gillman2024selfcorrecting,
+  title={Self-Correcting Self-Consuming Loops for Generative Model Training},
+  author={Gillman, Nate and Freeman, Michael and Aggarwal, Daksh and Hsu, Chia-Hong and Luo, Calvin and Tian, Yonglong and Sun, Chen},
+  booktitle={Proceedings of the 41st International Conference on Machine Learning},
+  pages={15646--15677},
   year={2024},
-  eprint={2402.07087},
-  archivePrefix={arXiv},
-  primaryClass={cs.LG}
+  volume={235},
+  publisher={PMLR}
 }
 ```
